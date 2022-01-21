@@ -20,7 +20,7 @@ delta = timedelta(days=1)
 start_date_unix = int(start_date.timestamp())
 end_date_unix = int(end_date.timestamp())
 
-amount = 10000
+account = {"balance": 10000, "shares": 0}
 
 # loop through dates (this could be multithreaded in the future)
     # send current data to strategy
@@ -31,17 +31,9 @@ amount = 10000
 # while start_date <= end_date:
 data = collection.find_one({"_id": str(start_date.date())})
 for i, time in enumerate(data["dates"]):
-    price = data["USD"][i]
-    date = datetime.strptime(datetime.utcfromtimestamp(time/1000).strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S") - timedelta(hours=6)
-
-    # short position with half of amount 
-    if i == 0:
-        # short(amount, price)
-        print("first")
-    # buy back all shares when time is around 3:30
-    elif  date.time() > datetime.strptime("03:30:00", "%H:%M:%S").time() and date.time() < datetime.strptime("6:30:00", "%H:%M:%S").time() :
-        print(i)
-        break
+    account = strat1(account, data["USD"][i], i, time)
+    
     # else
         # maybe at one point check if we have reach certain profit percentage and take profits
     # start_date += delta
+print()
